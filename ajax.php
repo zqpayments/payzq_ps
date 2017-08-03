@@ -73,7 +73,7 @@ if ($payZQ && $payZQ->active) {
 
     // revisar esto aqui
     if (true || isset($params['token']) && !empty($params['token'])) {
-        $payZQ->chargev2($params);
+        $payZQ->authorize_and_capture($params);
     } else {
         die('ko');
     }

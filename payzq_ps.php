@@ -667,7 +667,7 @@ class Payzq_ps extends PaymentModule
     }
 
     /* HG - make a call to charge a payment API */
-    public function chargev2(array $params)
+    public function authorize_and_capture(array $params)
     {
         if (!$this->getSecretKey() || !$this->getMerchantKey()) {
             die(Tools::jsonEncode(array('code' => '0', 'msg' => $this->l('Invalid PayZQ credentials, please check your configuration.'))));
@@ -684,13 +684,6 @@ class Payzq_ps extends PaymentModule
             $data = $this->generateData($cardHolderName, $params);
 
             list($curl_body, $curl_status, $curl_header) = $this->callCURL($data);
-
-            print_r('$curl_body');
-            print_r($curl_body);
-            print_r('$curl_status');
-            print_r($curl_status);
-            print_r('$curl_header');
-            print_r($curl_header);
 
             if ($curl_status == 200 && $message = json_decode($curl_body, true)) {
               if ($message['code'] === '00') {
@@ -798,7 +791,7 @@ class Payzq_ps extends PaymentModule
       );
 
       $avs = array(
-        "address" => $address_invoice->firstname. ' ' .$address_invoice->lastname,
+        "address" => $address_invoice->address1. ' ' .$address_invoice->address2,
         "country" => 'ESP',
         "state_province" => $address_invoice->city,
         "email" => 'test@test.com',
