@@ -1,13 +1,7 @@
 /**
- * cbpFWTabs.js v1.0.0 (modified)
- * http://www.codrops.com
- *
- * Licensed under the MIT license.
- * http://www.opensource.org/licenses/mit-license.php
- *
- * Copyright 2014, Codrops
- * http://www.codrops.com
+ * 2017 - PayZQ
  */
+
 ;(function(window) {
 
 	'use strict';

@@ -1,30 +1,25 @@
 /**
-* 2007-2017 PrestaShop
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-* @author    PrestaShop SA <contact@prestashop.com>
-* @copyright 2007-2017 PrestaShop SA
-* @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
-* International Registered Trademark & Property of PrestaShop SA
-*/
+ * 2017 - PayZQ
+ */
 
 $(document).ready(function() {
 
 	//rename switch fiels value labels
 	$('label[for=_PS_PAYZQ_mode_on]').html(payzq_test_mode);
 	$('label[for=_PS_PAYZQ_mode_off]').html(live);
-	$('#section-shape-2 .form-group').first().append(conf_mode_description1+'<br>'+conf_mode_description2+' <a href="https://dashboard.PayZQ.com/account/apikeys" target="blank">'+conf_mode_description3+'</a>.');
+
+	// refund
+	$('#section-shape-3 .form-wrapper').first().prepend('<p class="mt-15 ">'+conf_refund_1+'.</p>');
+
+	// API config
+	$('#section-shape-4 .form-wrapper').first().prepend('<p class="mt-15 ">'+conf_mode_description3+' <a href="http://payzq.net">payzq.net</a>.</p>');
+	$('#section-shape-4 .form-wrapper').first().prepend('<p class="mt-15 ">'+conf_mode_description2+'</p>');
+	$('#section-shape-4 .form-wrapper').first().prepend('<p class="mt-15 ">'+conf_mode_description1+'</p>');
 
 	// multistore
 	var old = $('.bootstrap.panel');
 	$('#content').after(old);
 	old.css('margin-left', '12%');
-
 
 	var value = 0;
 	value = $('input[name=_PS_PAYZQ_mode]:checked', '#configuration_form').val();
@@ -32,16 +27,12 @@ $(document).ready(function() {
 	if (value == 1)
 	{
 		$("#secret_key").parent().parent().hide();
-		$("#public_key").parent().parent().hide();
 		$("#test_secret_key").parent().parent().show();
-		$("#test_public_key").parent().parent().show();
 	}
 	else
 	{
 		$("#secret_key").parent().parent().show();
-		$("#public_key").parent().parent().show();
 		$("#test_secret_key").parent().parent().hide();
-		$("#test_public_key").parent().parent().hide();
 	}
 
 	$('#configuration_form input').on('change', function() {
@@ -84,15 +75,14 @@ $(document).ready(function() {
 			$("#refund_amount").parent().parent().show();
 	});
 
-	$('.process-icon-refresh').click(function(){
-        $.ajax({
-            url: validate + 'refresh.php',
-            data: {'token_payzq' : token_payzq,
-            'id_employee' : id_employee}
-        }).done(function(response) {
-            $('.table').html(response);
-        });
-    });
-
+	// $('.process-icon-refresh').click(function(){
+  //       $.ajax({
+  //           url: validate + 'refresh.php',
+  //           data: {'token_payzq' : token_payzq,
+  //           'id_employee' : id_employee}
+  //       }).done(function(response) {
+  //           $('.table').html(response);
+  //       });
+  //   });
 
 });

@@ -1,18 +1,11 @@
-
-
 <?php
-/**
- * 2007-2017 PrestaShop
- *
- * DISCLAIMER
- ** Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
- *
- * @author PayZQ <contact@payzq.com>
- * @copyright 2017 PayZQ SA
- * @license PayZQ SA
- */
+/*
+* 2017 PayZQ
+*
+*	@author PayZQ
+*	@copyright	2017 PayZQ
+*	@license		http://payzq.net/
+*/
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -89,8 +82,8 @@ class Payzq_ps extends PaymentModule
         parent::__construct();
 
         $this->meta_title = $this->l('PayZQ');
-        $this->displayName = $this->l('PayZQ payment module');
-        $this->description = $this->l('Start accepting PayZQ payments today, directly from your shop!');
+        $this->displayName = $this->l('PayZQ Payment');
+        $this->description = $this->l('Easily receive money from your PrestaShop store through PayZQ. Start today!');
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?', $this->name);
         if (!Configuration::get('PS_SSL_ENABLED')) {
             $this->warning = $this->l('You must enable SSL on the store if you want to use this module');
@@ -216,7 +209,7 @@ class Payzq_ps extends PaymentModule
     public static function arrayAsHtmlList(array $ar = array())
     {
         if (!empty($ar)) {
-            return '<ul><li>'.implode('</li><li>', $ar).'</li></ul>';
+            return '<ul style="list-style-type: none;"><li>'.implode('</li><li>', $ar).'</li></ul>';
         }
         return '';
     }
@@ -234,7 +227,7 @@ class Payzq_ps extends PaymentModule
 
         foreach ($msgs_list as $display => $msgs) {
             if (!empty($msgs)) {
-                $terror = call_user_func(array($this, $display), '<p>PayZQ</p>'.self::arrayAsHtmlList($msgs)).$terror;
+                $terror = call_user_func(array($this, $display), '<p style="font-size:16px;"><strong>PayZQ</strong></p>'.self::arrayAsHtmlList($msgs)).$terror;
             }
         }
 
@@ -343,7 +336,6 @@ class Payzq_ps extends PaymentModule
             $this->displayTransaction(),
             // $this->displaySecure(),
             $this->displayRefundForm(),
-            $this->displayFAQ(),
             $this->displayContact()
         );
 
@@ -357,14 +349,26 @@ class Payzq_ps extends PaymentModule
             'title' => $this->l('PayZQ Payment'),
             'contents' => array(
                 array(
-                    'name' => $this->l('About PayZQ'),
-                    'icon' => 'icon-book',
+                    'name' => $this->l('PayZQ'),
+                    'icon' => '',
                     'value' => $content[0],
                     'badge' => $this->getBadgesClass(),
                 ),
                 array(
-                    'name' => $this->l('Configuration'),
-                    'icon' => 'icon-power-off',
+                    'name' => $this->l('Transactions'),
+                    'icon' => '',
+                    'value' => $content[2],
+                    'badge' => $this->getBadgesClass(),
+                ),
+                array(
+                    'name' => $this->l('Refund'),
+                    'icon' => '',
+                    'value' => $content[3],
+                    'badge' => $this->getBadgesClass(),
+                ),
+                array(
+                    'name' => $this->l('API Configuration'),
+                    'icon' => '',
                     'value' => $content[1],
                     'badge' => $this->getBadgesClass(array(
                         'log_error_secret',
@@ -375,34 +379,18 @@ class Payzq_ps extends PaymentModule
                         'empty'
                     )),
                 ),
-                array(
-                    'name' => $this->l('Transactions'),
-                    'icon' => 'icon-credit-card',
-                    'value' => $content[2],
-                    'badge' => $this->getBadgesClass(),
-                ),
+
                 // array(
                 //     'name' => $this->l('3D secure'),
                 //     'icon' => 'icon-credit-card',
                 //     'value' => $content[3],
                 //     'badge' => $this->getBadgesClass(),
                 // ),
-                array(
-                    'name' => $this->l('Refund'),
-                    'icon' => 'icon-ticket',
-                    'value' => $content[3],
-                    'badge' => $this->getBadgesClass(),
-                ),
-                array(
-                    'name' => $this->l('FAQ'),
-                    'icon' => 'icon-question',
-                    'value' => $content[4],
-                    'badge' => $this->getBadgesClass(),
-                ),
+
                 array(
                     'name' => $this->l('Contact'),
-                    'icon' => 'icon-envelope',
-                    'value' => $content[5],
+                    'icon' => '',
+                    'value' => $content[4],
                     'badge' => $this->getBadgesClass(),
                 ),
             ),
@@ -413,7 +401,6 @@ class Payzq_ps extends PaymentModule
         $this->context->smarty->assign('tab_contents', $tab_contents);
         $this->context->smarty->assign('ps_version', _PS_VERSION_);
         $this->context->smarty->assign('new_base_dir', $this->_path);
-        $this->context->controller->addJs($this->_path.'/views/js/faq.js');
         $this->context->controller->addCss($this->_path.'/views/css/started.css');
         $this->context->controller->addCss($this->_path.'/views/css/tabs.css');
         $this->context->controller->addJs($this->_path.'/views/js/back.js');
@@ -516,7 +503,7 @@ class Payzq_ps extends PaymentModule
 
         /* Check if SSL is enabled */
         if (!Configuration::get('PS_SSL_ENABLED')) {
-            $this->errors[] = $this->l('A SSL certificate is required to process credit card payments using PayZQ. Please consult the FAQ.');
+            $this->errors[] = $this->l('A SSL certificate is required to process credit card payments using PayZQ.');
         }
 
         /* Do Log In  */
@@ -916,8 +903,6 @@ class Payzq_ps extends PaymentModule
         $token = Configuration::get(self::_PS_PAYZQ_.'key');
       }
 
-      $codify_data = ($merchant_key && $merchant_key != '') ? true : false;
-
       $token_payload = JWT::decode($token, $this->key_jwt, false);
       $cypher = (in_array('cypher', $token_payload['security'])) ? true : false;
 
@@ -928,7 +913,7 @@ class Payzq_ps extends PaymentModule
 
       $json = json_encode($data, JSON_PRESERVE_ZERO_FRACTION);
 
-      if ($codify_data) {
+      if ($cypher) {
         $cypher_data = $this->cypherData($json);
         $json = json_encode(array('request' => $cypher_data));
       }
@@ -1153,20 +1138,20 @@ class Payzq_ps extends PaymentModule
 
         $fields_form[1]['form'] = array(
             'legend' => array(
-                'title' => $this->l('Choose an Order you want to Refund'),
+                'title' => $this->l('Order Refund'),
             ),
             'input' => array(
                 array(
                     'type' => 'text',
-                    'label' => $this->l('PayZQ Transaction ID'),
-                    'desc' => '<i>'.$this->l('To process a refund, please input PayZQ’s payment ID below, which can be found in the « Payments » tab of this plugin').'</i>',
+                    'label' => $this->l('Transaction ID'),
+                    'desc' => '<i>'.$this->l('Locate the identifier of the transaction to which you want to make a return in the option "Transactions"').'</i>',
                     'name' => self::_PS_PAYZQ_.'refund_id',
                     'class' => 'fixed-width-xxl',
                     'required' => true
                 ),
                 array(
                     'type' => 'radio',
-                    'desc' => '<i>'.$this->l('Refunds take 5 to 10 days to appear on your customer\'s statement').'</i>',
+                    'desc' => '<i>'.$this->l('Refunds some days to appear on your customer\'s statement').'</i>',
                     'name' => self::_PS_PAYZQ_.'refund_mode',
                     'size' => 50,
                     'values' => array(
@@ -1185,7 +1170,7 @@ class Payzq_ps extends PaymentModule
                 array(
                     'type' => 'text',
                     'label' => $this->l('Amount'),
-                    'desc' => $this->l('Please, enter an amount your want to refund'),
+                    'desc' => $this->l('Enter an amount your want to refund'),
                     'name' => self::_PS_PAYZQ_.'refund_amount',
                     'size' => 20,
                     'id' => 'refund_amount',
@@ -1242,16 +1227,10 @@ class Payzq_ps extends PaymentModule
             }
 
             $this->context->smarty->assign('tenta', $tenta);
-            $output .= $this->display($this->_path, 'views/templates/admin/transaction.tpl');
+            // $output .= $this->display($this->_path, 'views/templates/admin/transaction.tpl');
         }
 
         return $output;
-    }
-
-    /* HG - show the FAQ  */
-    public function displayFaq()
-    {
-        return $this->display($this->_path, 'views/templates/admin/faq.tpl');
     }
 
     /* HG - show the contact view  */

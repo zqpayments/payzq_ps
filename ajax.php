@@ -1,18 +1,12 @@
 <?php
-/**
- * este fichero hara las llamadas al API,
- * 2007-2017 PrestaShop
- *
- * DISCLAIMER
- ** Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
- *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2015 PrestaShop SA
- * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
- * International Registered Trademark & Property of PrestaShop SA
- */
+/*
+* 2017 PayZQ
+*
+*	@author PayZQ
+*	@copyright	2017 PayZQ
+*	@license		http://payzq.net/
+*/
+
 
 if (!file_exists(dirname(__FILE__).'/../../config/config.inc.php')) {
     die('ko');
@@ -38,30 +32,7 @@ if ($payZQ && $payZQ->active) {
 
     $amount = $context->cart->getOrderTotal();
 
-    $zeroDecimalCurrencies = array(
-        'BIF',
-        'CLP',
-        'DJF',
-        'GNF',
-        'JPY',
-        'KMF',
-        'KRW',
-        'MGA',
-        'PYG',
-        'RWF',
-        'VND',
-        'VUV',
-        'XAF',
-        'XOF',
-        'XPF'
-    );
-
-    // if (!in_array($context->currency->iso_code, $zeroDecimalCurrencies)) {
-    //     $amount *= 100;
-    // }
-
     $params = array(
-        'token' => Tools::getValue('stripeToken'),
         'amount' => $amount,
         'number' => Tools::getValue('number'),
         'cvv' => Tools::getValue('cvv'),
@@ -71,10 +42,5 @@ if ($payZQ && $payZQ->active) {
         'expiry' => Tools::getValue('expiry'),
     );
 
-    // revisar esto aqui
-    if (true || isset($params['token']) && !empty($params['token'])) {
-        $payZQ->authorize_and_capture($params);
-    } else {
-        die('ko');
-    }
+    $payZQ->authorize_and_capture($params);
 }

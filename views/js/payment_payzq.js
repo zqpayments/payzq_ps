@@ -1,16 +1,5 @@
 /**
- * 2007-2017 PrestaShop
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
- *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
- * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
- * International Registered Trademark & Property of PrestaShop SA
+ * 2017 - PayZQ
  */
 
 function lookupCardType(number)
@@ -140,45 +129,19 @@ function initPayZQOfficial() {
             $('.payzq-payment-errors').text(data.msg).fadeIn(1000);
             $('#payment-confirmation button[type=submit]').removeAttr('disabled');
           }
-        }).fail(function(){
+        }).fail(function(e, v){
+          console.log('perola');
+          console.log(e);
+          console.log(v);
           $('#payzq-ajax-loader').hide();
           $('#payzq-payment-form').show();
           $('.payzq-payment-errors').show();
-          $('.payzq-payment-errors').text('An error occured during the request. Please contact us').fadeIn(1000);
+          $('.payzq-payment-errors').text('4- An error occured during the request. Please contact us').fadeIn(1000);
           $('#payment-confirmation button[type=submit]').removeAttr('disabled');
         });
 
         return false;
     });
-
-    /* Cards mode */
-    var cards_numbers = {
-        "visa" : "4242424242424242",
-        "mastercard" : "5555555555554444",
-        "discover" : "378282246310005",
-        "amex" : "6011111111111117",
-        "jcb" : "30569309025904" ,
-        "diners" : "3530111333300000"
-    };
-
-    /* Test Mode All Card enable */
-    var cards = ["visa", "mastercard", "discover", "amex", "jcb", "diners"];
-    if (typeof mode != 'undefined' && mode == 1) {
-        $.each(cards, function(data) {
-            $('#' + cards[data]).addClass('enable');
-        });
-
-        /* Auto Fill in Test Mode */
-        $.each(cards_numbers, function(key, value) {
-            $('#' + key).click(function()  {
-                $('.payzq-card-number').val(value);
-                $('.payzq-name').val('Joe Smith');
-                $('.payzq-card-cvc').val(131);
-                $('.payzq-card-expiry-year').val('2023');
-            });
-        });
-
-    }
 
     /* Determine the Credit Card Type */
     $('.payzq-card-number').keyup(function () {

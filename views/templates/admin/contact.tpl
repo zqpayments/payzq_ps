@@ -1,40 +1,24 @@
 {*
-* 2007-2017 PrestaShop
+* 2017 PayZQ
 *
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*	@author PrestaShop SA <contact@prestashop.com>
-*	@copyright	2007-2017 PrestaShop SA
-*	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
-*	International Registered Trademark & Property of PrestaShop SA
+*	@author PayZQ
+*	@copyright	2017 PayZQ
+*	@license		http://payzq.net/
 *}
 
-<h3>{l s='Thanks for choosing PayZQ.' mod='payzq_official'}</h3>
-<div class="form-group">
-	<br>
-	{l s='If you have any question related to PayZQ and this plugin, feel free to: ' mod='payzq_official'}<br>
-	- {l s='Check our support website: ' mod='payzq_official'}<a target='_blank' href="https://support.PayZQ.com"> https://support.PayZQ.com</a><br>
-	- {l s='Directly contact our support team: ' mod='payzq_official'}<a target='_blank' href="https://support.PayZQ.com/email"> https://support.PayZQ.com/email</a><br><br>
-	<!--{l s='To save you time, before you contact us:' mod='payzq_official'}<br>
-	- {l s='make sure you have read the documentation well.' mod='payzq_official'}<br>
-	- {l s='in the event you would be contacting us via the form, do not hesitate to give us your first message, maximum of details on' mod='payzq_official'}
-	{l s='the problem and its origins (screenshots, reproduce actions to find the bug, etc. ..)' mod='payzq_official'}	<br><br>
-	{l s='This module has been developped by PrestaShop and can only be sold through' mod='payzq_official'}
-	<a target='_blanck' href="http://addons.prestashop.com/index.php?{$url_track|escape:"url":"UTF-8"}">addons.prestashop.com</a>.
-	<br><br>
-	{l s='The PrestaShop Addons Team' mod='payzq_official'}<br>-->
+<div class="payzq-module-wrapper">
+	<div class="payzq-module-header">
+	   <span class="payzq-module-intro">{l s='Need Help?'}</span>
+	</div>
+	<div class="row payzq-wraper-content">
+		<div class="col-xs-12">
+			<p style="margin: 15px 0;">{l s='If you have any question related to PayZQ and this plugin, check our website and find the documentation or write us directly.'}</p>
+		</div>
+		<div class="col-xs-12">
+			<p style="margin: 15px 0;">{l s='Find out more about PayZQ on our website'} <a href="http://payzq.net">payzq.net</a></p>
+		</div>
+		<div class="col-xs-12">
+			<a style="margin: 15px 0;" class="pull-right" href="http://payzq.net/documentation">{l s='Documentation'} <i class="fa fa-angle-double-right" aria-hidden="true"></i> </a>
+		</div>
+	</div>
 </div>

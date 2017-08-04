@@ -1,29 +1,10 @@
 {*
-* 2007-2017 PrestaShop
+* 2017 PayZQ
 *
-
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*	@author PrestaShop SA <contact@prestashop.com>
-*	@copyright	2007-2017 PrestaShop SA
-*	@license		http://opensource.org/licenses/afl-3.0.php	Academic Free License (AFL 3.0)
-*	International Registered Trademark & Property of PrestaShop SA
+*	@author PayZQ
+*	@copyright	2017 PayZQ
+*	@license		http://payzq.net/
 *}
-
 <div class="tabs">
 
   <div class="sidebar navigation col-md-2">
@@ -63,13 +44,11 @@
 <script type="text/javascript">
 	var payzq_test_mode = "{l s='test' mod='payzq_official'}";
 	var live = "{l s='live' mod='payzq_official'}";
-	var conf_mode_description1 = "{l s='Now that you have created your PayZQ account, you have to enter below your API keys in both test and live mode.' mod='payzq_official'}";
-	var conf_mode_description2 = "{l s='These API keys can be found and managed from your PayZQ' mod='payzq_official'}";
-	var conf_mode_description3 = "{l s='dashboard' mod='payzq_official'}";
-	var Translation = [];
-	Translation[0] = "{l s='3D-Secure (Verified by VISA, MasterCard SecureCode™) is a system that is used to verify a customer’s identity before an online purchase can be completed, so that merchants can reduce fraud.' mod='payzq_official'}";
-	Translation[1] = "{l s='With 3D-Secure, customers are redirected to a page provided by their bank, where they are prompted to enter an additional password before their card can be charged.' mod='payzq_official'}";
-	Translation[2] = "{l s='You can learn more about 3D-Secure on our website: ' mod='payzq_official'}";
+  var conf_refund_1 = "{l s='From here you can refund all or part of a payment you have received. You will not be able to refund an amount greater than the amount of the transaction.' mod='payzq_official'}"
+
+  var conf_mode_description1 = "{l s='Once you have registered with payzq.net, copy your company ID and password to the API, so that you can start making transactions.' mod='payzq_official'}";
+  var conf_mode_description2 = "{l s='You can do test transactions whenever you indicate the mode of use in "test". Once all goes well, be sure to dial the "live" mode and enter the corresponding API access key.' mod='payzq_official'}";
+  var conf_mode_description3 = "{l s='Find your credentials from the administrative panel of' mod='payzq_official'}";
 </script>
 <script type="text/javascript" src="{$new_base_dir|escape:'htmlall':'UTF-8'}views/js/PSTabs.js"></script>
 <script type="text/javascript">

@@ -1,2 +1,2 @@
 #+TITLE: moduleTemplate
-#+AUTHOR: Prestashop
+#+AUTHOR: PayZQ
