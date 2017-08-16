@@ -767,6 +767,14 @@ class Payzq_ps extends PaymentModule
       $order_wrapping_cost_no_tax = round($this->context->cart->getOrderTotal(false, 6), 2);
       $order_wrapping_cost_total = round($this->context->cart->getOrderTotal(true, 6), 2);
 
+      $customer = new Customer(intval($this->context->cart->id_customer));
+
+
+      $mode = Configuration::get(self::_PS_PAYZQ_.'mode');
+      $token = ($mode == 1) ? Configuration::get(self::_PS_PAYZQ_.'test_key') : Configuration::get(self::_PS_PAYZQ_.'key');
+      $token_payload = JWT::decode($token, $this->key_jwt, false);
+      $send_avs = (in_array('avs', $token_payload['security'])) ? true : false;
+
       $products =  $this->context->cart->getProducts();
 
       $credit_card = array(
@@ -775,17 +783,6 @@ class Payzq_ps extends PaymentModule
         "number" => $params['number'],
         "cvv" => $params['cvv'],
         "expiry" => $params['expiry'],
-      );
-
-      $avs = array(
-        "address" => $address_invoice->address1. ' ' .$address_invoice->address2,
-        "country" => 'ESP',
-        "state_province" => $address_invoice->city,
-        "email" => 'test@test.com',
-        "cardholder_name" => $cardHolderName,
-        "postal_code" => $address_invoice->postcode,
-        "phone" => '',
-        "city" => $address_invoice->city,
       );
 
       $billing = array(
@@ -818,7 +815,8 @@ class Payzq_ps extends PaymentModule
           "description" => $product['name'],
           "subtotal" => $price,
           "taxes" => $total_wt - $price,
-          "total" => $total_wt
+          "total" => $total_wt,
+          "quantity" => $product['cart_quantity']
         );
       }
 
@@ -849,20 +847,36 @@ class Payzq_ps extends PaymentModule
       $host= gethostname();
       $ip = gethostbyname($host);
 
-      return array(
+      $response = array(
         "type" => "authorize_and_capture",
         "transaction_id" => $nex_code_transaction,
         "target_transaction_id" => '',
         "amount" => floatval(number_format($params['amount'], 2, '.', '')),
         "currency" => $params['currency'],
         "credit_card" => $credit_card,
-        "avs" => $avs,
         "billing" => $billing,
         "shipping" => $shipping,
         "breakdown" => $breakdown,
         "3ds" => false,
         "ip" => $ip,
       );
+
+      if ($send_avs) {
+        $avs = array(
+          "address" => $address_invoice->address1. ' ' .$address_invoice->address2,
+          "country" => $country_invoice->iso_code,
+          "state_province" => $address_invoice->city,
+          "email" => $customer->email,
+          "cardholder_name" => $cardHolderName,
+          "postal_code" => $address_invoice->postcode,
+          "phone" => $address_invoice->phone,
+          "city" => $address_invoice->city,
+        );
+
+        $response['avs'] = $avs;
+      }
+
+      return $response;
     }
 
 
