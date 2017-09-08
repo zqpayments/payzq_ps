@@ -1,5 +1,5 @@
 
-#PayZQ for PrestaShop by ZQ Payments#
+# PayZQ for PrestaShop by ZQ Payments #
 ======================
 
 PayZQ payment gateway for PrestaShop extension
