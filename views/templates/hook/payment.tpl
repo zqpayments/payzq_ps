@@ -37,7 +37,7 @@
           <label>{l s='Card Number ' mod='payzq_ps'}</label>  <label class="required"> </label><br />
           <input type="text" size="20" autocomplete="off" class="payzq-card-number" id="card_number" data-payzq="number" placeholder="&#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679; &#9679;&#9679;&#9679;&#9679;"/>
         </div>
-        <div class="block-left">
+        <div class="">
           <label>{l s='Expiry date' mod='payzq_ps'}</label>  <label class="required"> </label><br />
           <input type="text" size="7" autocomplete="off" id="card_expiry" class="payzq-card-expiry" maxlength = 5 placeholder="MM/YY"/>
         </div>

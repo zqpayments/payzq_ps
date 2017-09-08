@@ -12,7 +12,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once dirname(__FILE__).'/Curl.php';
-require_once dirname(__FILE__).'/JWT.php';
 
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
@@ -32,22 +31,16 @@ class Payzq_ps extends PaymentModule
     const _FLAG_NO_FLUSH__ = 16;
     const _FLAG_FLUSH__ = 32;
 
-    /* PayZQ Pre fix */
     const _PS_PAYZQ_ = '_PS_PAYZQ_';
 
-    /* 0: no VERBOSE, 1: VERBOSE, 2: VERBOSE + ANSI COLOR */
     public static $verbose = 2;
     public static $log_file = '';
     public $mail = '';
 
-    /* init conf var */
     private static $psconf = array();
-    /* init hook var */
     private static $pshook = array();
 
-    /* tab section shape */
     private $section_shape = 1;
-
     public $addons_track;
 
     public $errors = array();
@@ -60,7 +53,6 @@ class Payzq_ps extends PaymentModule
 
     // PayZQ
     private $api_base_url = 'http://test-zms.zertifica.org:7743/api/v1/transactions/';
-    private $key_jwt = 'secret';
     private $iv = '4242424242424242';
 
     public function __construct()
@@ -425,35 +417,35 @@ class Payzq_ps extends PaymentModule
     /* HG - verify if the secret key is set */
     public function contentLogIn()
     {
-        if (Tools::isSubmit('submit_login')) {
+      if (Tools::isSubmit('submit_login')) {
 
-            // check the merchant_key
-            $merchant_key = Tools::getValue(self::_PS_PAYZQ_.'merchant_key');
-            if (!empty($merchant_key)) {
-                  Configuration::updateValue(self::_PS_PAYZQ_.'merchant_key', Tools::getValue(self::_PS_PAYZQ_.'merchant_key'));
+        // check the merchant_key
+        $merchant_key = Tools::getValue(self::_PS_PAYZQ_.'merchant_key');
+        if (!empty($merchant_key)) {
+              Configuration::updateValue(self::_PS_PAYZQ_.'merchant_key', Tools::getValue(self::_PS_PAYZQ_.'merchant_key'));
+        } else {
+            $this->errors['empty'] = $this->l('Merchant ID and Token Key fields are mandatory');
+        }
+        Configuration::updateValue(self::_PS_PAYZQ_.'mode', Tools::getValue(self::_PS_PAYZQ_.'mode'));
+
+        if (Tools::getValue(self::_PS_PAYZQ_.'mode') == 1) {
+            $secret_key = Tools::getValue(self::_PS_PAYZQ_.'test_key');
+            if (!empty($secret_key)) {
+                Configuration::updateValue(self::_PS_PAYZQ_.'test_key', Tools::getValue(self::_PS_PAYZQ_.'test_key'));
             } else {
                 $this->errors['empty'] = $this->l('Merchant ID and Token Key fields are mandatory');
             }
             Configuration::updateValue(self::_PS_PAYZQ_.'mode', Tools::getValue(self::_PS_PAYZQ_.'mode'));
-
-            if (Tools::getValue(self::_PS_PAYZQ_.'mode') == 1) {
-                $secret_key = Tools::getValue(self::_PS_PAYZQ_.'test_key');
-                if (!empty($secret_key)) {
-                    Configuration::updateValue(self::_PS_PAYZQ_.'test_key', Tools::getValue(self::_PS_PAYZQ_.'test_key'));
-                } else {
-                    $this->errors['empty'] = $this->l('Merchant ID and Token Key fields are mandatory');
-                }
-                Configuration::updateValue(self::_PS_PAYZQ_.'mode', Tools::getValue(self::_PS_PAYZQ_.'mode'));
+        } else {
+            $secret_key = Tools::getValue(self::_PS_PAYZQ_.'key');
+            if (!empty($secret_key)) {
+                Configuration::updateValue(self::_PS_PAYZQ_.'key', Tools::getValue(self::_PS_PAYZQ_.'key'));
             } else {
-                $secret_key = Tools::getValue(self::_PS_PAYZQ_.'key');
-                if (!empty($secret_key)) {
-                    Configuration::updateValue(self::_PS_PAYZQ_.'key', Tools::getValue(self::_PS_PAYZQ_.'key'));
-                } else {
-                    $this->errors['empty'] = $this->l('Merchant ID and Token Key fields are mandatory');
-                }
-                Configuration::updateValue(self::_PS_PAYZQ_.'mode', Tools::getValue(self::_PS_PAYZQ_.'mode'));
+                $this->errors['empty'] = $this->l('Merchant ID and Token Key fields are mandatory');
             }
+            Configuration::updateValue(self::_PS_PAYZQ_.'mode', Tools::getValue(self::_PS_PAYZQ_.'mode'));
         }
+      }
     }
 
     /* HG - get form secure value */
@@ -772,7 +764,8 @@ class Payzq_ps extends PaymentModule
 
       $mode = Configuration::get(self::_PS_PAYZQ_.'mode');
       $token = ($mode == 1) ? Configuration::get(self::_PS_PAYZQ_.'test_key') : Configuration::get(self::_PS_PAYZQ_.'key');
-      $token_payload = JWT::decode($token, $this->key_jwt, false);
+      $token_payload = $this->getPayload($token);
+
       $send_avs = (in_array('avs', $token_payload['security'])) ? true : false;
 
       $products =  $this->context->cart->getProducts();
@@ -893,6 +886,54 @@ class Payzq_ps extends PaymentModule
       return $json_utf;
     }
 
+    private static function handleJsonError($errno)
+    {
+        $messages = array(
+            JSON_ERROR_DEPTH => 'Maximum stack depth exceeded',
+            JSON_ERROR_CTRL_CHAR => 'Unexpected control character found',
+            JSON_ERROR_SYNTAX => 'Syntax error, malformed JSON'
+        );
+        throw new DomainException(isset($messages[$errno])
+            ? $messages[$errno]
+            : 'Unknown JSON error: ' . $errno
+        );
+    }
+
+    public static function jsonDecode($input)
+    {
+        $obj = json_decode($input, true);
+        if (function_exists('json_last_error') && $errno = json_last_error()) {
+            $this->handleJsonError($errno);
+        }
+        else if ($obj === null && $input !== 'null') {
+            throw new DomainException('Null result with non-null input');
+        }
+        return $obj;
+    }
+
+    public static function urlsafeB64Decode($input)
+    {
+        $remainder = strlen($input) % 4;
+        if ($remainder) {
+            $padlen = 4 - $remainder;
+            $input .= str_repeat('=', $padlen);
+        }
+        return base64_decode(strtr($input, '-_', '+/'));
+    }
+
+    public function getPayload($jwt) {
+      $tks = explode('.', $jwt);
+      if (count($tks) != 3) {
+        throw new UnexpectedValueException('Wrong number of segments');
+      }
+      list($headb64, $payloadb64, $cryptob64) = $tks;
+
+      if (null === $payload = $this->jsonDecode($this->urlsafeB64Decode($payloadb64))) {
+          throw new UnexpectedValueException('Invalid segment encoding');
+      }
+      return $payload;
+    }
+
     public function decodeCypherData($codified_data)
     {
       $merchant_key = Configuration::get(self::_PS_PAYZQ_.'merchant_key');
@@ -910,6 +951,8 @@ class Payzq_ps extends PaymentModule
       $mode = Configuration::get(self::_PS_PAYZQ_.'mode');
       $merchant_key = Configuration::get(self::_PS_PAYZQ_.'merchant_key');
 
+      Logger::addLog("something");
+
       if ($mode == 1) {
         // mode test
         $token = Configuration::get(self::_PS_PAYZQ_.'test_key');
@@ -917,7 +960,7 @@ class Payzq_ps extends PaymentModule
         $token = Configuration::get(self::_PS_PAYZQ_.'key');
       }
 
-      $token_payload = JWT::decode($token, $this->key_jwt, false);
+      $token_payload = $this->getPayload($token);
       $cypher = (in_array('cypher', $token_payload['security'])) ? true : false;
 
       $curl_headers = array(
@@ -1051,7 +1094,7 @@ class Payzq_ps extends PaymentModule
                   ),
                   array(
                       'type' => 'text',
-                      'label' => $this->l('PayZQ Tokne'),
+                      'label' => $this->l('PayZQ Token'),
                       'name' => self::_PS_PAYZQ_.'key',
                       'size' => 20,
                       'id' => 'secret_key',
