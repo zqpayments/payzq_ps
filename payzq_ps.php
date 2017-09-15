@@ -537,11 +537,9 @@ class Payzq_ps extends PaymentModule
 
       return array(
         "type" => "refund",
-        "transaction_id" => $this->getNextCodeTransaction(),
-        "target_transaction_id" => $payZQ_order[0]['id_transaction'],
+        "transaction_id" => $payZQ_order[0]['id_transaction'],
         "amount" => floatval(number_format($amount, 2, '.', '')),
-        "currency" => $payZQ_order[0]['currency'],
-        "ip" => $ip,
+        "currency" => $payZQ_order[0]['currency']
       );
     }
 
@@ -614,8 +612,8 @@ class Payzq_ps extends PaymentModule
 
             $this->addTransaction(
               $message['authorization_code'],
+              'refund-'.$data['transaction_id'],
               $data['transaction_id'],
-              $data['target_transaction_id'],
               $refund[0]['name'],
               $refund[0]['type'],
               0,
@@ -668,7 +666,7 @@ class Payzq_ps extends PaymentModule
               if ($message['code'] === '00') {
                 $status = 1;
                 $authorization_code = $message['authorization_code'];
-                $this->addTransaction($authorization_code, $data['transaction_id'], $data['target_transaction_id'], $params['cardHolderName'], $params['type'], $params['amount'], 0, $params['currency'], $status, (int)$this->context->cart->id);
+                $this->addTransaction($authorization_code, $message['transaction_id'], '', $params['cardHolderName'], $params['type'], $params['amount'], 0, $params['currency'], $status, (int)$this->context->cart->id);
 
                 $message = $this->l('PayZQ Transaction authorization_code:').' '.$authorization_code;
 
@@ -699,7 +697,7 @@ class Payzq_ps extends PaymentModule
               } else {
                 $status = 0;
                 $authorization_code = $message['authorization_code'];
-                $this->addTransaction($authorization_code, $data['transaction_id'], $data['target_transaction_id'], $params['cardHolderName'], $params['type'], $params['amount'], 0, $params['currency'], $status, (int)$this->context->cart->id);
+                $this->addTransaction($authorization_code, 'error-300', '', $params['cardHolderName'], $params['type'], $params['amount'], 0, $params['currency'], $status, (int)$this->context->cart->id);
 
                 die(Tools::jsonEncode(array(
                     'code' => '0',
@@ -709,7 +707,7 @@ class Payzq_ps extends PaymentModule
               }
             } else {
               // server error
-              $this->addTransaction($curl_body, $data['transaction_id'], $data['target_transaction_id'], $params['cardHolderName'], $params['type'], $params['amount'], 0, $params['currency'], 0, (int)$this->context->cart->id);
+              $this->addTransaction($curl_body, 'error-500', '', $params['cardHolderName'], $params['type'], $params['amount'], 0, $params['currency'], 0, (int)$this->context->cart->id);
 
               die(Tools::jsonEncode(array(
                   'code' => '0',
@@ -719,7 +717,7 @@ class Payzq_ps extends PaymentModule
 
         } catch (Exception $e) {
 
-            $this->addTransaction($e->getMessage(), $data['transaction_id'], $data['target_transaction_id'], $params['cardHolderName'], $params['type'], $params['amount'], 0, $params['currency'], 0, (int)$this->context->cart->id);
+            $this->addTransaction($e->getMessage(), 'excpt', '', $params['cardHolderName'], $params['type'], $params['amount'], 0, $params['currency'], 0, (int)$this->context->cart->id);
 
             die(Tools::jsonEncode(array(
                 'code' => '0',
@@ -790,7 +788,6 @@ class Payzq_ps extends PaymentModule
 
       $shipping = array(
         "name" => $cardHolderName,
-        "fiscal_code" => '',
         "address" => $address_delivery->address1. ' '. $address_delivery->address2,
         "country" => $country_invoice->iso_code, //$this->context->country->iso_code,
         "state_province" => $address_delivery->city,
@@ -809,7 +806,7 @@ class Payzq_ps extends PaymentModule
           "subtotal" => $price,
           "taxes" => $total_wt - $price,
           "total" => $total_wt,
-          "quantity" => $product['cart_quantity']
+          "quantity" => intval($product['cart_quantity'])
         );
       }
 
@@ -842,8 +839,8 @@ class Payzq_ps extends PaymentModule
 
       $response = array(
         "type" => "authorize_and_capture",
-        "transaction_id" => $nex_code_transaction,
-        "target_transaction_id" => '',
+        // "transaction_id" => $nex_code_transaction,
+        // "target_transaction_id" => '',
         "amount" => floatval(number_format($params['amount'], 2, '.', '')),
         "currency" => $params['currency'],
         "credit_card" => $credit_card,
@@ -1123,6 +1120,7 @@ class Payzq_ps extends PaymentModule
             self::_PS_PAYZQ_.'key' => Configuration::get(self::_PS_PAYZQ_.'key'),
             self::_PS_PAYZQ_.'merchant_key' => Configuration::get(self::_PS_PAYZQ_.'merchant_key'),
             self::_PS_PAYZQ_.'test_key' => Configuration::get(self::_PS_PAYZQ_.'test_key'),
+            self::_PS_PAYZQ_.'cypher_key' => Configuration::get(self::_PS_PAYZQ_.'cypher_key'),
         ));
 
         return $this->renderGenericForm($fields_form, $fields_value, $this->getSectionShape(), $submit_action);
