@@ -52,7 +52,7 @@ class Payzq_ps extends PaymentModule
     public $refund = 0;
 
     // PayZQ
-    private $api_base_url = 'http://test-zms.zertifica.org:7743/api/v1/transactions/';
+    private $api_base_url = 'https://payzq.net/api/v1/transactions/';
     private $iv = '4242424242424242';
 
     public function __construct()
