@@ -839,6 +839,8 @@ class Payzq_ps extends PaymentModule
 
       $response = array(
         "type" => "authorize_and_capture",
+        "source" => "prestashop",
+        
         // "transaction_id" => $nex_code_transaction,
         // "target_transaction_id" => '',
         "amount" => floatval(number_format($params['amount'], 2, '.', '')),
