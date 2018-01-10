@@ -537,6 +537,7 @@ class Payzq_ps extends PaymentModule
 
       return array(
         "type" => "refund",
+        "source" => "prestashop",
         "transaction_id" => $payZQ_order[0]['id_transaction'],
         "amount" => floatval(number_format($amount, 2, '.', '')),
         "currency" => $payZQ_order[0]['currency']
