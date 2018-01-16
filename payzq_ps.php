@@ -1458,8 +1458,7 @@ class Payzq_ps extends PaymentModule
     /* HG - generate the payment form */
     protected function generateForm()
     {
-        // TODO: ojo aqui con este true
-        if (true || Configuration::get('PS_SSL_ENABLED')) {
+        if (Configuration::get(self::_PS_PAYZQ_.'mode') == '1' || Configuration::get('PS_SSL_ENABLED') == 1) {
             $context = $this->context;
 
             $amount = $context->cart->getOrderTotal();
